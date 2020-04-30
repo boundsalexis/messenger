@@ -1,28 +1,18 @@
-//dependencies
-const express = require("express");
-var cors = require("cors");
-const routes = require("./routes");
+const http = require('http');
+const express = require('express');
+const MessagingResponse = require('twilio').twiml.MessagingResponse;
+require('dotenv').config();
 const app = express();
-const PORT = process.env.PORT || 3000;
-require("dotenv").config();
 
+app.post('/sms', (req, res) => {
+  const twiml = new MessagingResponse();
 
-//middleware to handle, APIs and JSON
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+  twiml.message('I said good day!');
 
-//allows us to use our routes
-app.use(routes);
+  res.writeHead(200, {'Content-Type': 'text/xml'});
+  res.end(twiml.toString());
+});
 
-//telling heroku to use the build folder when serving web page
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-}
-
-
-app.listen(PORT, function () {
-
-    console.log(`🌎  ==> API Server now listening on PORT ${PORT}!`);
-  });
-  
+http.createServer(app).listen(3001, () => {
+  console.log('Express server listening on port 3001');
+});
